@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class MessageDispatcher(object):
+
     def __init__(self, slackclient, plugins, errors_to):
         self._client = slackclient
         self._pool = WorkerPool(self.dispatch_msg)
@@ -31,9 +32,11 @@ class MessageDispatcher(object):
         alias_regex = ''
         if getattr(settings, 'ALIASES', None):
             logger.info('using aliases %s', settings.ALIASES)
-            alias_regex = '|(?P<alias>{})'.format('|'.join([re.escape(s) for s in settings.ALIASES.split(',')]))
+            alias_regex = '|(?P<alias>{})'.format(
+                '|'.join([re.escape(s) for s in settings.ALIASES.split(',')]))
 
-        self.AT_MESSAGE_MATCHER = re.compile(r'^(?:\<@(?P<atuser>\w+)\>:?|(?P<username>\w+):{}) ?(?P<text>.*)$'.format(alias_regex))
+        self.AT_MESSAGE_MATCHER = re.compile(
+            r'^(?:\<@(?P<atuser>\w+)\>:?|(?P<username>U\w+):{}) ?(?P<text>.*)$'.format(alias_regex))
 
     def start(self):
         self._pool.start()
@@ -178,6 +181,7 @@ def unicode_compact(func):
 
 
 class Message(object):
+
     def __init__(self, slackclient, body):
         self._client = slackclient
         self._body = body
